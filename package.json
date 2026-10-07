@@ -1,0 +1,73 @@
+{
+  "name": "airewards-vscode",
+  "version": "0.1.0",
+  "displayName": "AIRewards",
+  "description": "AIRewards earn-loop for Visual Studio Code, Cursor, and Windsurf.",
+  "publisher": "airewards",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "main": "./dist/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      {
+        "command": "airewards.setApiKey",
+        "category": "AIRewards",
+        "title": "Set / Update API Key"
+      },
+      {
+        "command": "airewards.updateApiKey",
+        "category": "AIRewards",
+        "title": "Change API Key"
+      },
+      {
+        "command": "airewards.diagnose",
+        "category": "AIRewards",
+        "title": "Diagnose & Check Status"
+      },
+      {
+        "command": "airewards.fetchAdNow",
+        "category": "AIRewards",
+        "title": "Fetch Ad Now"
+      },
+      {
+        "command": "airewards.openCurrentAd",
+        "category": "AIRewards",
+        "title": "Open Sponsored Ad"
+      }
+    ],
+    "configuration": {
+      "title": "AIRewards",
+      "properties": {
+        "airewards.apiBaseUrl": {
+          "type": "string",
+          "scope": "machine",
+          "default": "https://www.airewards.tech",
+          "description": "Base URL of the AIRewards API. Only change this for local backend development."
+        }
+      }
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airewards/vscode-extension"
+  },
+  "bugs": {
+    "url": "https://github.com/airewards/vscode-extension/issues"
+  },
+  "homepage": "https://www.airewards.tech",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "package:vsix": "tsc -p tsconfig.json && npx @vscode/vsce package --no-dependencies",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.5.0"
+  }
+}
