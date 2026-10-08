@@ -40,11 +40,12 @@ export class MissingApiKeyError extends Error {
   }
 }
 
-/** Raised for non-2xx responses; `status` lets callers branch on 401/404/409/429. */
+/** Raised for non-2xx responses; `status` lets callers branch on 401/404/403/409/429. */
 export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    readonly retryAfter?: number,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -151,7 +152,12 @@ export class AirewardsApiClient {
     );
 
     if (response.status === 404) return null;
-    if (!response.ok) throw new ApiError(response.status, `Ad fetch failed (${response.status})`);
+    if (!response.ok) {
+      const retryAfterHeader = response.headers.get('Retry-After');
+      const parsedRetryAfter = retryAfterHeader ? Number.parseInt(retryAfterHeader, 10) : undefined;
+      const retryAfter = Number.isFinite(parsedRetryAfter) ? parsedRetryAfter : undefined;
+      throw new ApiError(response.status, `Ad fetch failed (${response.status})`, retryAfter);
+    }
 
     const body = (await response.json()) as SuccessEnvelope<WireAd>;
     if (!isHttpsUrl(body.data.url)) {

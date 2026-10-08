@@ -224,6 +224,24 @@ export class AdManager implements vscode.Disposable {
             'AIRewards rejected your API key. Run "AIRewards: Set / Update API Key" to update it.',
           );
         }
+      } else if (error instanceof ApiError && error.status === 403) {
+        const retryAfterSec = error.retryAfter ?? 3600;
+        this.log(
+          `Ad fetch paused: account not eligible for ads (403 Forbidden). Retrying in ${retryAfterSec}s.`,
+        );
+        this.showIdle();
+        if (this.pollTimer) {
+          clearInterval(this.pollTimer);
+          this.pollTimer = setTimeout(
+            () => {
+              if (!this.disposed) {
+                void this.poll();
+                this.pollTimer = setInterval(() => void this.poll(), POLL_INTERVAL_MS);
+              }
+            },
+            Math.max(POLL_INTERVAL_MS, retryAfterSec * 1000),
+          );
+        }
       } else {
         const errorMsg = error instanceof Error ? error.message : String(error);
         this.log(`Poll error: ${errorMsg}`);
